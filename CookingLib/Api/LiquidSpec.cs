@@ -29,5 +29,8 @@ namespace CookingLib
 
         /// <summary>How strong a splash is when ConsumableThroughSkin is true.</summary>
         public float SplashStrength = 1f;
+
+        /// <summary> How much thirst the liquid will give [Optional] <summary>
+        public float? Thirst { get; set; }
     }
 }
