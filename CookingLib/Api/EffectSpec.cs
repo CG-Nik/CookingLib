@@ -8,5 +8,8 @@ namespace CookingLib
 
         /// <summary>Strength multiplier, from minus 100 to 100.</summary>
         public float Strength = 1f;
+
+        /// <summary>The duration of the effect, in seconds. 0s means instant.</summary>
+        public float durationInSeconds = 0f;
     }
 }
