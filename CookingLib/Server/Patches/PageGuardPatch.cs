@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alta;
@@ -17,14 +18,22 @@ namespace CookingLib
 
         static bool Prefix(StewRecipePageProvider __instance, ref PageData __result)
         {
-            List<StewRecipe> vanilla = HashedGeneralValue<StewRecipe>.All.Where(recipe => StewRecipes.Find(recipe) == null).ToList();
             __result = null;
-            if (vanilla.Count == 0)
-                return false;
+            try
+            {
+                List<StewRecipe> vanilla = HashedGeneralValue<StewRecipe>.All.Where(recipe => StewRecipes.Find(recipe) == null).ToList();
+                if (vanilla.Count == 0)
+                    return false;
 
-            StewRecipe pick = vanilla[UnityEngine.Random.Range(0, vanilla.Count)];
-            if (GlobalPagesManager.IsNew(__instance.Identifier, pick.Hash))
-                __result = __instance.GeneratePage(pick);
+                StewRecipe pick = vanilla[UnityEngine.Random.Range(0, vanilla.Count)];
+                if (GlobalPagesManager.IsNew(__instance.Identifier, pick.Hash))
+                    __result = __instance.GeneratePage(pick);
+            }
+            catch (Exception e)
+            {
+                __result = null;
+                Safe.Fail(nameof(PageGuardPatch), e);
+            }
             return false;
         }
     }

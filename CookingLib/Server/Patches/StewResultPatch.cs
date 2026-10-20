@@ -1,3 +1,4 @@
+using System;
 using Alta.Cooking;
 using Alta.Liquid;
 using HarmonyLib;
@@ -16,16 +17,30 @@ namespace CookingLib
 
         static void Prefix(StewRecipe ___currentRecipe, ref Color colorTint)
         {
-            LibStewRecipe ours = StewRecipes.Find(___currentRecipe);
-            if (ours != null && ours.Spec.Tint.HasValue)
-                colorTint = ours.Spec.Tint.Value;
+            try
+            {
+                LibStewRecipe ours = StewRecipes.Find(___currentRecipe);
+                if (ours != null && ours.Spec.Tint.HasValue)
+                    colorTint = ours.Spec.Tint.Value;
+            }
+            catch (Exception e)
+            {
+                Safe.Fail(nameof(StewResultPatch) + " tint", e);
+            }
         }
 
         static void Postfix(StewRecipe ___currentRecipe, ref LiquidContent __result)
         {
-            LibStewRecipe ours = StewRecipes.Find(___currentRecipe);
-            if (ours != null && ours.Result != null)
-                __result = ours.Result.CreateContent();
+            try
+            {
+                LibStewRecipe ours = StewRecipes.Find(___currentRecipe);
+                if (ours != null && ours.Result != null)
+                    __result = ours.Result.CreateContent();
+            }
+            catch (Exception e)
+            {
+                Safe.Fail(nameof(StewResultPatch) + " result", e);
+            }
         }
     }
 }

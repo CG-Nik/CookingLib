@@ -1,3 +1,4 @@
+using System;
 using Alta.Cooking;
 using Alta.Liquid;
 using HarmonyLib;
@@ -12,18 +13,31 @@ namespace CookingLib
                 prefix: new HarmonyMethod(typeof(PotBasePatch), nameof(Prefix)));
         }
 
-        static void Prefix(CookingPot __instance, bool isSettingLiquidOfStewManager, StewManager ___stewManager)
+        static void Prefix(CookingPot __instance, ref bool isSettingLiquidOfStewManager, StewManager ___stewManager)
         {
-            if (!isSettingLiquidOfStewManager || ___stewManager == null)
-                return;
+            try
+            {
+                if (!isSettingLiquidOfStewManager || ___stewManager == null)
+                    return;
 
-            LiquidContent content = __instance.CookingLiquid.LiquidContainer.ContainedLiquid;
-            if (content == null || !content.IsCustom)
-                return;
+                if (___stewManager.Ingredients.Count > 0)
+                {
+                    isSettingLiquidOfStewManager = false;
+                    return;
+                }
 
-            LibLiquid liquid = Liquids.FindServerOnly(content.Data);
-            if (liquid != null)
-                ___stewManager.SetBaseLiquid(liquid.Definition);
+                LiquidContent content = __instance.CookingLiquid.LiquidContainer.ContainedLiquid;
+                if (content == null || !content.IsCustom)
+                    return;
+
+                LibLiquid liquid = Liquids.FindServerOnly(content.Data);
+                if (liquid != null)
+                    ___stewManager.SetBaseLiquid(liquid.Definition);
+            }
+            catch (Exception e)
+            {
+                Safe.Fail(nameof(PotBasePatch), e);
+            }
         }
     }
 }

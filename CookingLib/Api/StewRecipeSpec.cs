@@ -21,7 +21,7 @@ namespace CookingLib
         /// <summary>Up to 3 effects the stew gains on top of its ingredients.</summary>
         public List<EffectSpec> ExtraEffects = new List<EffectSpec>();
 
-        /// <summary>Multipliers on the stew's summed effects. Every extra effect gets 1 unless listed here.</summary>
+        /// <summary>Multipliers on the stew's whole total for an effect. Like extra effects, a listed multiplier is also scaled by the stew's stage. Effects not listed are left as they are.</summary>
         public List<EffectSpec> EffectModifiers = new List<EffectSpec>();
 
         /// <summary>Optional colour in place of the borrowed stew's own. Every channel from 0 to 1.</summary>

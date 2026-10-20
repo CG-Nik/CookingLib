@@ -75,6 +75,8 @@ namespace CookingLib
         internal static bool IsValidColor(Color c) =>
             c.r >= 0f && c.g >= 0f && c.b >= 0f && c.a >= 0f && c.r <= 1f && c.g <= 1f && c.b <= 1f && c.a <= 1f;
 
+        internal static bool IsWithin100(float value) => !float.IsNaN(value) && Mathf.Abs(value) <= 100f;
+
         static int Quantize(float channel) => Mathf.RoundToInt(Mathf.Clamp01(channel) * 1023f);
     }
 }

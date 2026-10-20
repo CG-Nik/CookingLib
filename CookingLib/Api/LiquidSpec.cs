@@ -30,7 +30,7 @@ namespace CookingLib
         /// <summary>How strong a splash is when ConsumableThroughSkin is true.</summary>
         public float SplashStrength = 1f;
 
-        /// <summary>Amount of thirst the liquid will give (100 max) [Optional][null = 40f][supports negative] </summary>
+        /// <summary>Thirst this liquid gives, for thirst mods such as HydrateOrDiedrate. CookingLib only stores it. Minus 100 to 100, where 100 is a full thirst bar and negative makes the drinker thirstier. Null leaves it to the thirst mod, HydrateOrDiedrate then uses 40.</summary>
         public float? Thirst { get; set; }
     }
 }

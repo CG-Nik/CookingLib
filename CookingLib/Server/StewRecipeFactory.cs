@@ -6,6 +6,7 @@ using Alta.Alchemy;
 using Alta.Cooking;
 using Alta.Inventory;
 using Alta.Liquid;
+using Alta.Networking;
 using UnityEngine;
 
 namespace CookingLib
@@ -34,11 +35,7 @@ namespace CookingLib
 
             List<EffectDefinitionApplication> extra = new List<EffectDefinitionApplication>();
             foreach (EffectSpec effect in spec.ExtraEffects)
-            {
-                EffectDefinition definition = AddOnce(extra, effect, "extra effect");
-                if (!modifiers.Any(modifier => modifier.EffectToModify == definition))
-                    modifiers.Add(new EffectDefinitionApplication(definition, 1f));
-            }
+                AddOnce(extra, effect, "extra effect");
 
             List<StewIngredientBase> slots = new List<StewIngredientBase>();
             for (int i = 0; i < spec.Slots.Count; i++)
@@ -64,16 +61,19 @@ namespace CookingLib
             StewRecipe vanilla = Names.Find<StewRecipe>(name);
             if (vanilla != null && StewRecipes.Find(vanilla) == null)
                 return vanilla.BaseVersionHash;
-            return Names.NeedPrefab(name).Hash;
+
+            NetworkPrefab prefab = Names.NeedPrefab(name);
+            if (prefab.GetComponent<StewComponent>() == null)
+                throw new ArgumentException(prefab.name + " is not a stew, Look takes a stew recipe or a stew prefab");
+            return prefab.Hash;
         }
 
-        static EffectDefinition AddOnce(List<EffectDefinitionApplication> list, EffectSpec effect, string kind)
+        static void AddOnce(List<EffectDefinitionApplication> list, EffectSpec effect, string kind)
         {
             EffectDefinition definition = Names.Need<EffectDefinition>(effect.Effect, "effect");
             if (list.Any(existing => existing.EffectToModify == definition))
                 throw new ArgumentException(kind + " " + definition.name + " is listed twice");
             list.Add(new EffectDefinitionApplication(definition, effect.Strength));
-            return definition;
         }
 
         static StewIngredientBase Slot(string name, SlotSpec slot)

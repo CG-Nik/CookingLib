@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Alta.Cooking;
-using UnityEngine;
 
 namespace CookingLib
 {
@@ -114,7 +113,7 @@ namespace CookingLib
                 throw new ArgumentException("ExtraEffects and EffectModifiers can't be null or hold a null effect");
             if (spec.ExtraEffects.Count > 3)
                 throw new ArgumentException("a stew shows at most 3 extra effects");
-            if (spec.ExtraEffects.Concat(spec.EffectModifiers).Any(effect => Mathf.Abs(effect.Strength) > 100f))
+            if (spec.ExtraEffects.Concat(spec.EffectModifiers).Any(effect => !LiquidFactory.IsWithin100(effect.Strength)))
                 throw new ArgumentException("effect strengths must be minus 100 to 100");
             if (spec.Tint.HasValue && !LiquidFactory.IsValidColor(spec.Tint.Value))
                 throw new ArgumentException("tint channels must be 0 to 1");

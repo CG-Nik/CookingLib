@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Alta;
 using Alta.Liquid;
-using UnityEngine;
 
 namespace CookingLib
 {
@@ -38,6 +37,22 @@ namespace CookingLib
             if (!Main.IsServer || liquid == null || container == null || GlobalLiquidContainer.Instance == null)
                 return false;
             return GlobalLiquidContainer.FillLiquidIntoContainer(liquid.CreateContent(), container, amount, true);
+        }
+
+        /// <summary>The registered liquid in this content, for example container.ContainedLiquid, or null for vanilla liquids, stews and anything else. Server only liquids match by value, so they still match after a restart.</summary>
+        public static LibLiquid Find(LiquidContent content)
+        {
+            if (content == null)
+                return null;
+            if (content.IsCustom)
+                return FindServerOnly(content.Data);
+
+            foreach (LibLiquid liquid in all)
+            {
+                if (liquid.Error == null && liquid.IsShared && ReferenceEquals(liquid.Definition, content.Liquid))
+                    return liquid;
+            }
+            return null;
         }
 
         internal static LibLiquid FindServerOnly(LiquidData data)
@@ -110,9 +125,11 @@ namespace CookingLib
 
             foreach (EffectSpec effect in spec.Effects)
             {
-                if (Mathf.Abs(effect.Strength) > 100f)
+                if (!LiquidFactory.IsWithin100(effect.Strength))
                     throw new ArgumentException("effect strengths must be minus 100 to 100");
             }
+            if (spec.Thirst.HasValue && !LiquidFactory.IsWithin100(spec.Thirst.Value))
+                throw new ArgumentException("Thirst must be minus 100 to 100");
         }
 
         static void CheckLookalikes(string fingerprint)

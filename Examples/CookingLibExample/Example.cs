@@ -1,18 +1,32 @@
 using System.Collections.Generic;
+using System.Text;
+using Alta.Console;
+using Alta.Liquid;
 using CookingLib;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(CookingLibExample.Example), "CookingLibExample", "0.1.0", "Shadow")]
+[assembly: MelonInfo(typeof(CookingLibExample.Example), "CookingLibExample", "0.1.1", "Shadow")]
 [assembly: MelonGame("Alta", "A Township Tale")]
 
 namespace CookingLibExample
 {
     public class Example : MelonMod
     {
+        static bool commandsAdded;
+
         public override void OnInitializeMelon()
         {
             CookingLib.Main.Setup += Setup;
+        }
+
+        public override void OnUpdate()
+        {
+            if (commandsAdded || !CookingLib.Main.IsServer || NetworkSceneManager.Current == null)
+                return;
+
+            commandsAdded = true;
+            CommandService.CommandCollection.ProcessModule(typeof(ExampleCommands), typeof(ExampleCommands).Assembly, null);
         }
 
         static void Setup()
@@ -33,6 +47,24 @@ namespace CookingLibExample
                 Name = "Black Dye",
                 Look = "Water Liquid Visual Data",
                 Color = new Color(0.08f, 0.08f, 0.08f)
+            });
+
+            Liquids.RegisterServerOnly(new LiquidSpec
+            {
+                Id = "example.weakskin",
+                Name = "Weak Oakskin",
+                Look = "Water Liquid Visual Data",
+                Color = new Color(0.62f, 0.5f, 0.35f),
+                Effects = { new EffectSpec { Effect = "Damage Protection Indirect effect", Strength = 0.35f } }
+            });
+
+            Liquids.RegisterServerOnly(new LiquidSpec
+            {
+                Id = "example.oakskin",
+                Name = "Oakskin",
+                Look = "Water Liquid Visual Data",
+                Color = new Color(0.45f, 0.3f, 0.15f),
+                Effects = { new EffectSpec { Effect = "Damage Protection Indirect effect", Strength = 2f } }
             });
 
             StewRecipes.Register(new StewRecipeSpec
@@ -64,6 +96,37 @@ namespace CookingLibExample
                 Item = "Coal Ash",
                 OutputLiquid = "example.ashwater"
             });
+
+            Infusions.Register(new InfusionSpec
+            {
+                Id = "example.weakskininfusion",
+                Item = "Copper Ingot",
+                OutputLiquid = "example.weakskin"
+            });
+
+            Infusions.Register(new InfusionSpec
+            {
+                Id = "example.oakskininfusion",
+                Item = "Iron Ingot",
+                OutputLiquid = "example.oakskin"
+            });
+        }
+    }
+
+    [Module("cookinglibexample", "CookingLibExample: find")]
+    internal static class ExampleCommands
+    {
+        [Command("find", "Names the CookingLib liquid in every loaded container, using Liquids.Find")]
+        public static string Find()
+        {
+            StringBuilder text = new StringBuilder();
+            foreach (LiquidContainer container in Object.FindObjectsOfType<LiquidContainer>())
+            {
+                LibLiquid liquid = Liquids.Find(container.ContainedLiquid);
+                if (liquid != null)
+                    text.Append(container.transform.root.name).Append(" holds ").Append(liquid.Id).Append('\n');
+            }
+            return text.Length == 0 ? "no container holds a CookingLib liquid" : text.ToString();
         }
     }
 }
