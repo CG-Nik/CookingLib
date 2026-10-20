@@ -10,6 +10,6 @@ namespace CookingLib
         public float Strength = 1f;
 
         /// <summary>The duration of the effect, in seconds. 0s means instant.</summary>
-        public float durationInSeconds = 0f;
+        public float DurationInSeconds = 0f;
     }
 }
