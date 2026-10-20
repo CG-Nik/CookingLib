@@ -25,7 +25,7 @@ namespace CookingLib
 
             List<EffectDefinitionApplication> effects = new List<EffectDefinitionApplication>();
             foreach (EffectSpec effect in spec.Effects)
-                effects.Add(new EffectDefinitionApplication(Names.Need<EffectDefinition>(effect.Effect, "effect"), effect.Strength));
+                effects.Add(new EffectDefinitionApplication(Names.Need<EffectDefinition>(effect.Effect, "effect"), effect.Strength, effect.DurationInSeconds));
 
             List<LiquidVisualChunkDefinition> chunks = new List<LiquidVisualChunkDefinition>();
             foreach (string chunk in spec.Chunks)
